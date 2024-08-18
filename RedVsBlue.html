@@ -1,0 +1,177 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Red or Blue Game</title>
+    <style>
+        /* Allgemeine Stile */
+        body {
+            font-family: 'Arial', sans-serif;
+            display: flex;
+            flex-direction: column;
+            justify-content: center;
+            align-items: center;
+            height: 100vh;
+            margin: 0;
+            background: linear-gradient(to right, #ff4b1f, #1fddff);
+            color: white;
+        }
+
+        h1 {
+            font-size: 3em;
+            margin-bottom: 20px;
+            text-transform: uppercase;
+            letter-spacing: 2px;
+            animation: fadeIn 2s;
+        }
+
+        .question {
+            margin: 20px 0;
+            font-size: 2em;
+            animation: fadeIn 2s;
+        }
+
+        .button {
+            padding: 15px 30px;
+            margin: 10px;
+            font-size: 1.5em;
+            cursor: pointer;
+            border: none;
+            color: white;
+            border-radius: 10px;
+            transition: transform 0.3s ease;
+            text-transform: uppercase;
+            letter-spacing: 1px;
+            font-weight: bold;
+            animation: bounce 1.5s infinite;
+        }
+
+        .red {
+            background-color: rgba(255, 0, 0, 0.8);
+        }
+
+        .blue {
+            background-color: rgba(0, 0, 255, 0.8);
+        }
+
+        .button:hover {
+            transform: scale(1.1);
+        }
+
+        .result, .count, .timer {
+            font-size: 1.5em;
+            margin-top: 20px;
+            animation: fadeIn 1s;
+        }
+
+        .copyright {
+            position: absolute;
+            bottom: 10px;
+            right: 10px;
+            font-size: 0.8em;
+            color: #fff;
+            opacity: 0.6;
+        }
+
+        /* Animationen */
+        @keyframes fadeIn {
+            from { opacity: 0; }
+            to { opacity: 1; }
+        }
+
+        @keyframes bounce {
+            0%, 100% { transform: translateY(0); }
+            50% { transform: translateY(-10px); }
+        }
+    </style>
+</head>
+<body>
+
+    <h1>Red or Blue?</h1>
+    <div class="timer">15 seconds left</div>
+    <div class="question">Loading...</div>
+    <div>
+        <button class="button red" onclick="choose('red')">Red</button>
+        <button class="button blue" onclick="choose('blue')">Blue</button>
+    </div>
+    <div class="result"></div>
+    <div class="count"></div>
+
+    <audio id="gameSound" src="game-sound.mp3" preload="auto"></audio>
+
+    <div class="copyright">&copy; setrox</div>
+
+    <script>
+        let questions = [
+            { question: "Cold Shower or Hot Shower?", redAnswer: "Cold Shower", redPercentage: 38, blueAnswer: "Hot Shower", bluePercentage: 62 },
+            { question: "Cats or Dogs?", redAnswer: "Cats", redPercentage: 47, blueAnswer: "Dogs", bluePercentage: 53 },
+            { question: "Play Video Games or Watch Movies?", redAnswer: "Play Video Games", redPercentage: 55, blueAnswer: "Watch Movies", bluePercentage: 45 },
+            { question: "Work from Home or Office?", redAnswer: "Work from Home", redPercentage: 60, blueAnswer: "Work from Office", bluePercentage: 40 },
+            { question: "Tea or Coffee?", redAnswer: "Tea", redPercentage: 45, blueAnswer: "Coffee", bluePercentage: 55 },
+            { question: "Morning or Night?", redAnswer: "Morning", redPercentage: 40, blueAnswer: "Night", bluePercentage: 60 },
+            { question: "Beach or Mountains?", redAnswer: "Beach", redPercentage: 50, blueAnswer: "Mountains", bluePercentage: 50 },
+            { question: "Apple or Android?", redAnswer: "Apple", redPercentage: 65, blueAnswer: "Android", bluePercentage: 35 },
+            // Füge weitere Fragen hier hinzu...
+        ];
+
+        let currentQuestionIndex = 0;
+        let redCount = 0;
+        let blueCount = 0;
+        let timeLeft = 15;
+        let timer;
+
+        function loadQuestion() {
+            if (currentQuestionIndex < questions.length) {
+                timeLeft = 15;
+                document.querySelector('.question').textContent = questions[currentQuestionIndex].question;
+                document.querySelector('.timer').textContent = `${timeLeft} seconds left`;
+                document.querySelector('.result').textContent = "";
+                startTimer();
+            } else {
+                document.querySelector('.question').textContent = "All questions answered!";
+                document.querySelector('.result').innerHTML = `Red Chosen: ${redCount} times<br>Blue Chosen: ${blueCount} times`;
+                clearInterval(timer);
+            }
+        }
+
+        function startTimer() {
+            timer = setInterval(() => {
+                timeLeft--;
+                document.querySelector('.timer').textContent = `${timeLeft} seconds left`;
+                if (timeLeft <= 0) {
+                    clearInterval(timer);
+                    loadQuestion(); // Nächste Frage ohne Auswahl
+                }
+            }, 1000);
+        }
+
+        function choose(color) {
+            clearInterval(timer);
+            let question = questions[currentQuestionIndex];
+            let resultText;
+
+            if (color === 'red') {
+                redCount++;
+                resultText = `Red: ${question.redPercentage}% | Blue: ${question.bluePercentage}%`;
+            } else {
+                blueCount++;
+                resultText = `Blue: ${question.bluePercentage}% | Red: ${question.redPercentage}%`;
+            }
+
+            document.querySelector('.result').textContent = resultText;
+            playSound();
+            currentQuestionIndex++;
+            setTimeout(loadQuestion, 2000); // Load next question after 2 seconds
+        }
+
+        function playSound() {
+            let sound = document.getElementById('gameSound');
+            sound.play();
+        }
+
+        loadQuestion();
+    </script>
+
+</body>
+</html>
